@@ -1,28 +1,26 @@
 ## Introduction
 
-![My image](image.png)
-
 Well the first thing I should do is ssh into the challenge to see what is going on exactly.
-![See here](notimportant/Pasted image 20250515182859.png)
+![See here](Pasted image 20250515182859.png)
 We are now in this ssh session.
 
-![See here](notimportant/Pasted image 20250515183123.png)
+![See here](Pasted image 20250515183123.png)
 
 We are greeted with a nice gui, and a note saying we can put files into /tmp.
 Lets use the dir command to see what we have to work with.
 
-![See here](notimportant/Pasted image 20250515183244.png)
+![See here](Pasted image 20250515183244.png)
 
 We can see there are 3 files, flag, passcode and passcode.c.
 Obviously flag is the file we want and it is placed there without any protection, lets try to cat it.
 
-![See here](notimportant/Pasted image 20250515183642.png)
+![See here](Pasted image 20250515183642.png)
 
 Those two files, passcode and passcode.c look interesting. But since this repo is focused on reverse engineering, unfortunately we don't have access to passcode.c. But we do have access to the binary. (At the end of **Analysis** we will see how close we were in mapping the functions)\*
 
 Lets use scp to copy the file into our vm so we can actually begin with the analysis.
 
-![See here](notimportant/Pasted image 20250515184151.png)
+![See here](Pasted image 20250515184151.png)
 
 ---
 
@@ -30,7 +28,7 @@ Lets use scp to copy the file into our vm so we can actually begin with the anal
 
 Since we now have the file we can begin with gdb.
 
-![See here](notimportant/Pasted image 20250515184331.png)
+![See here](Pasted image 20250515184331.png)
 
 Well now I just realized I haven't even run the file yet.
 But since I have already disassembled main we can continue from here.
@@ -58,7 +56,7 @@ Well this function doesn't seem to do much except call the two functions **welco
 
 So now we move onto the **welcome** function as that comes right after.
 
-![See here](notimportant/Pasted image 20250515185225.png)
+![See here](Pasted image 20250515185225.png)
 
 I notice that:
 
@@ -87,8 +85,8 @@ Lets now dissect the login function, which is probably the most exciting, as the
 
 Well the login seems to be the biggest function, which makes me very excited.
 
-![See here](notimportant/Pasted image 20250515191323.png)
-![See here](notimportant/Pasted image 20250515191344.png)
+![See here](Pasted image 20250515191323.png)
+![See here](Pasted image 20250515191344.png)
 
 Well the function is so big that I needed two pages on my terminal, but lets get back on track. These are the things I notice:
 
@@ -128,7 +126,7 @@ Well so that was a more exciting function, well now what I wonder is how to get 
 Well since we can't figure out anything from this, lets look at the c code.
 
 Here's the c code:
-![See here](notimportant/Pasted image 20250515194025.png)
+![See here](Pasted image 20250515194025.png)
 
 Opening it up using nano, lets first compare my pseudo-code, also from the length of the tab you can probably tell I am a beginner.
 
@@ -194,10 +192,10 @@ So this can be seen, in the welcome disassembly, it asks for input of exactly 10
 
 Directly after the scanf is the fflush function, and if we disassemble the fflush function:
 
-![See here](notimportant/Pasted image 20250515200104.png)
+![See here](Pasted image 20250515200104.png)
 
 Well how nice, its a got thing, as I am a beginner, I just know that as jump tables, I guess its the same thing, but anyways, here we see it jumps to the address pointed by 0x804c014. That means if we overwrite the value inside 0x804c014 we can control the execution flow, but we should just set it to after we pass from the variable comparison, right here:
-![See here](notimportant/Pasted image 20250515200433.png)
+![See here](Pasted image 20250515200433.png)
 
 Alright lets move on to the Exploit.
 
